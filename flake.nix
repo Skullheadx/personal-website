@@ -19,6 +19,7 @@
         ];
 
         shellHook = ''
+          echo "Personal Website Project"
           exec fish
         '';
       };
