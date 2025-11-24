@@ -37,6 +37,6 @@ func getHealth(c *gin.Context) {
 
 func getMainPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"title": "Main website",
+		"title": "Skullheadx",
 	})
 }
