@@ -1,3 +1,3 @@
-module example.com/gomod2nix-template
+module andrew/personal-website
 
 go 1.17
