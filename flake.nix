@@ -1,55 +1,75 @@
 {
-  description = "Personal Website Project";
+  description = "A basic gomod2nix flake";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.gomod2nix.url = "github:nix-community/gomod2nix";
+  inputs.gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.gomod2nix.inputs.flake-utils.follows = "flake-utils";
+  inputs.pre-commit-hooks.url = "github:cachix/git-hooks.nix";
 
   outputs =
-    { self, nixpkgs }:
-    let
-      pkgs = import nixpkgs { system = "x86_64-linux"; };
-    in
     {
+      self,
+      nixpkgs,
+      flake-utils,
+      gomod2nix,
+      pre-commit-hooks,
+      ...
+    }:
+    (flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
 
-      devShells.x86_64-linux.default = pkgs.mkShell {
-        packages = with pkgs; [
-          go
-          curl
-          fish
-          (buildGoModule rec {
-            pname = "pet";
-            version = "0.3.4";
-
-            src = fetchFromGitHub {
-              owner = "knqyf263";
-              repo = "pet";
-              tag = "v${version}";
-              hash = "sha256-Gjw1dRrgM8D3G7v6WIM2+50r4HmTXvx0Xxme2fH9TlQ=";
-            };
-
-            vendorHash = "sha256-6hCgv2/8UIRHw1kCe3nLkxF23zE/7t5RDwEjSzX3pBQ=";
-          })
-          # (pkgs.buildGoModule rec {
-          #   pname = "gin-proxy";
-          #   version = "unstable-2024-12-01";
-          #   src = pkgs.fetchFromGitHub {
-          #     owner = "codegangsta";
-          #     repo = "gin";
-          #     rev = "master";
-          #     sha256 = "sha256-TZSpCcFBlXLPE50bYbXPU5ddoVsBG7YGa7oLmKDFBmE="; # ← you will update this
-          #   };
-          #   vendorHash = null;
-          #   doCheck = false;
-          #   modRoot = "/home/andrew/dev/personal-site/<D-;>";
-          # })
-        ];
-
-        shellHook = ''
-          echo "Personal Website Project"
-          exec fish
-        '';
-      };
-
-    };
+        callPackage = pkgs.callPackage;
+        # Simple test check added to nix flake check
+        go-test = pkgs.stdenvNoCC.mkDerivation {
+          name = "go-test";
+          dontBuild = true;
+          src = ./.;
+          doCheck = true;
+          nativeBuildInputs = with pkgs; [
+            go
+            writableTmpDirAsHomeHook
+          ];
+          checkPhase = ''
+            go test -v ./...
+          '';
+          installPhase = ''
+            mkdir "$out"
+          '';
+        };
+        # Simple lint check added to nix flake check
+        go-lint = pkgs.stdenvNoCC.mkDerivation {
+          name = "go-lint";
+          dontBuild = true;
+          src = ./.;
+          doCheck = true;
+          nativeBuildInputs = with pkgs; [
+            golangci-lint
+            go
+            writableTmpDirAsHomeHook
+          ];
+          checkPhase = ''
+            golangci-lint run
+          '';
+          installPhase = ''
+            mkdir "$out"
+          '';
+        };
+      in
+      {
+        checks = {
+          inherit go-test go-lint;
+        };
+        packages.default = callPackage ./. {
+          inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
+        };
+        devShells.default = callPackage ./shell.nix {
+          inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
+          inherit pre-commit-hooks;
+        };
+      }
+    ));
 }
