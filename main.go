@@ -12,6 +12,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.GET("/health", getHealth)
+	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	if err := router.Run("localhost:8080"); err != nil {
 		log.Fatal(err)
 	}
