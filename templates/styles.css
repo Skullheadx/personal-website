@@ -7,24 +7,41 @@
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   padding: 0 1.5rem;
   background: white; /* or your color */
   border-bottom: 1px solid #ddd;
   z-index: 1000; /* keeps it above page content */
 }
-.nav {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 1rem;
-}
 
+html,
 body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+main {
   padding-top: 60px;
+  flex: 1;
 }
 section {
   scroll-margin-top: 70px; /* slightly bigger than your 60px header */
+}
+
+.site-footer {
+  margin: 0;
+  padding: 0.5rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-footer a {
+  padding: 0.5em 1em;
+  display: block;
 }
