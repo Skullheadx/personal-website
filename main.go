@@ -4,12 +4,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	isProduction := false
+	if os.Getenv("PRODUCTION") == "TRUE" {
+		fmt.Print("Using Production Configuration\n")
+		isProduction = true
+		// gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*.html")
 
@@ -18,8 +26,10 @@ func main() {
 	// router.GET("/about", getAboutPage)
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	router.StaticFile("/assets/resume.pdf", "./assets/Andrew_Montgomery_Resume.pdf")
-	if err := router.Run("localhost:8080"); err != nil {
-		log.Fatal(err)
+	if isProduction {
+		log.Fatal(autotls.Run(router, "andrew-montgomery.dev"))
+	} else {
+		log.Fatal(router.Run(":8080"))
 	}
 }
 
