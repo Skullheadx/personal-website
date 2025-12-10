@@ -1,5 +1,30 @@
-p {
-  color: red;
-  padding: 10px;
-  text-decoration: underline;
+.site-header {
+  position: fixed; /* stays at top even while scrolling */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 1.5rem;
+  background: white; /* or your color */
+  border-bottom: 1px solid #ddd;
+  z-index: 1000; /* keeps it above page content */
+}
+.nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+body {
+  padding-top: 60px;
+}
+section {
+  scroll-margin-top: 70px; /* slightly bigger than your 60px header */
 }
