@@ -26,6 +26,7 @@ func main() {
 	// router.GET("/about", getAboutPage)
 	router.StaticFile("/favicon.ico", "./assets/favicon.ico")
 	router.StaticFile("/assets/resume.pdf", "./assets/Andrew_Montgomery_Resume.pdf")
+	router.StaticFile("/styles.css", "./templates/styles.css")
 	if isProduction {
 		log.Fatal(autotls.Run(router, "andrew-montgomery.dev"))
 	} else {
